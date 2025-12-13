@@ -9,6 +9,7 @@ import OccupancyFootfallCard from "../Components/ui/OccupancyFootfallCard";
 import OverallOccupancyChart from "../Components/ui/OverallOccupancyChart";
 import DemographicsCard from "../Components/ui/DemographicsCard";
 import DemographicsAnalysisChart from "../Components/ui/DemographicsAnalysisChart";
+import VisitorTable from "../Components/ui/VisitorTable";
 
 export default function DashboardPage() {
   const [activeView, setActiveView] = useState<"overview" | "crowd-entries">(
@@ -49,6 +50,14 @@ export default function DashboardPage() {
                 <DemographicsCard />
                 <DemographicsAnalysisChart />
               </div>
+            </div>
+          )}
+          {activeView === "crowd-entries" && (
+            <div className="pt-10 px-5">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                Crowd Entries View
+              </h3>
+              <VisitorTable />
             </div>
           )}
         </main>
