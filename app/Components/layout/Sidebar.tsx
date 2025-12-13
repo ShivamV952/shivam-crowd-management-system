@@ -2,7 +2,14 @@
 
 import { useRouter } from "next/navigation";
 
-export default function Sidebar() {
+type ViewType = "overview" | "crowd-entries";
+
+interface SidebarProps {
+  activeView: ViewType;
+  onViewChange: (view: ViewType) => void;
+}
+
+export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
   const router = useRouter();
 
   const handleLogout = () => {
@@ -27,14 +34,33 @@ export default function Sidebar() {
         <nav className="mt-6 space-y-2 px-3">
           
           {/* Overview */}
-          <button className="flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm text-gray-200 hover:bg-white/10 transition">
+          <button 
+            onClick={() => onViewChange("overview")}
+            className={`relative flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm transition ${
+              activeView === "overview"
+                ? "bg-white/20 font-medium"
+                : "text-gray-200 hover:bg-white/10"
+            }`}
+          >
+            {activeView === "overview" && (
+              <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r bg-white" />
+            )}
             <span className="text-lg">🏠</span>
             <span>Overview</span>
           </button>
 
-          {/* Crowd Entries - Active */}
-          <button className="relative flex w-full items-center gap-3 rounded-md bg-white/20 px-4 py-3 text-sm font-medium">
-            <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r bg-white" />
+          {/* Crowd Entries */}
+          <button 
+            onClick={() => onViewChange("crowd-entries")}
+            className={`relative flex w-full items-center gap-3 rounded-md px-4 py-3 text-sm transition ${
+              activeView === "crowd-entries"
+                ? "bg-white/20 font-medium"
+                : "text-gray-200 hover:bg-white/10"
+            }`}
+          >
+            {activeView === "crowd-entries" && (
+              <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r bg-white" />
+            )}
             <span className="text-lg">↗</span>
             <span>Crowd Entries</span>
           </button>
