@@ -67,10 +67,10 @@ export default function DashboardPage() {
               <div className="pt-10 px-10">
                 <OverallOccupancyChart key={refreshKey} siteId={selectedSiteId} />
               </div>
-              <div className="pt-10 flex justify-around items-center">
-                <DemographicsCard />
-                <DemographicsAnalysisChart />
-              </div>
+               <div className="pt-10 flex justify-around items-center">
+                 <DemographicsCard siteId={selectedSiteId} />
+                 <DemographicsAnalysisChart siteId={selectedSiteId} />
+               </div>
             </div>
           )}
           {activeView === "crowd-entries" && (

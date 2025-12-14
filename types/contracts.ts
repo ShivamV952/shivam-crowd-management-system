@@ -70,3 +70,24 @@ export interface FootfallResponse {
   footfall: number;
 }
 
+export interface DemographicsRequest {
+  siteId: string;
+  toUtc: string;
+  fromUtc: string;
+}
+
+export interface DemographicsBucket {
+  utc: number;
+  local: string;
+  male: number;
+  female: number;
+}
+
+export interface DemographicsResponse {
+  siteId: string;
+  fromUtc: string;
+  toUtc: string;
+  timezone: string;
+  buckets: DemographicsBucket[];
+}
+
