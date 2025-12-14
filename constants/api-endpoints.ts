@@ -19,6 +19,11 @@ export const API_ENDPOINTS = {
     GET_ALL: `${BASE_URL}/sites`,
   },
 
+  // Analytics endpoints
+  ANALYTICS: {
+    OCCUPANCY: `${BASE_URL}/analytics/occupancy`,
+  },
+
   // Add more endpoint groups here as needed
   // DASHBOARD: {
   //   OVERVIEW: `${BASE_URL}/dashboard/overview`,

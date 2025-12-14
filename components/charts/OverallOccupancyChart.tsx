@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import axios, { AxiosError } from "axios";
 import {
   Area,
   AreaChart,
@@ -10,20 +12,131 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { getOccupancy } from "@/services/api/analytics.service";
+import { OccupancyRequest } from "@/types/contracts";
 
-const data = [
-  { time: "08:00", count: 150 },
-  { time: "09:00", count: 155 },
-  { time: "10:00", count: 160 },
-  { time: "11:00", count: 170 },
-  { time: "12:00", count: 165 },
-  { time: "13:00", count: 175 },
-  { time: "14:00", count: 180 },
-  { time: "15:00", count: 175 },
-  { time: "16:00", count: 185 },
-];
+interface OverallOccupancyChartProps {
+  siteId?: string;
+}
 
-export default function OverallOccupancyChart() {
+export default function OverallOccupancyChart({
+  siteId,
+}: OverallOccupancyChartProps) {
+  const [chartData, setChartData] = useState<
+    { time: string; count: number }[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState<string>("");
+
+  useEffect(() => {
+    if (!siteId) {
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchOccupancyData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Calculate time range: last 24 hours
+        const now = new Date();
+        const toUtc = now.getTime().toString();
+        const fromUtc = (now.getTime() - 24 * 60 * 60 * 1000).toString(); // 24 hours ago
+
+        const request: OccupancyRequest = {
+          siteId,
+          fromUtc,
+          toUtc,
+        };
+
+        const response = await getOccupancy(request);
+
+        // Transform API response to chart data format
+        const transformedData = response.buckets.map((bucket) => {
+          // Extract time from local string (format: "10/12/2025 00:00:00")
+          const timeMatch = bucket.local.match(/(\d{1,2}):\d{2}:\d{2}/);
+          const time = timeMatch ? timeMatch[1] : "";
+          
+          return {
+            time: `${time}:00`,
+            count: Math.round(bucket.avg),
+          };
+        });
+
+        setChartData(transformedData);
+
+        // Set current time for live marker
+        const currentHour = now.getHours();
+        setCurrentTime(`${currentHour.toString().padStart(2, "0")}:00`);
+      } catch (err) {
+        // Handle axios errors
+        if (axios.isAxiosError(err)) {
+          const axiosError = err as AxiosError<{ message?: string }>;
+          const errorMessage =
+            axiosError.response?.data?.message ||
+            axiosError.message ||
+            "Failed to load occupancy data. Please try again.";
+          setError(errorMessage);
+        } else if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred. Please try again.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOccupancyData();
+  }, [siteId]);
+
+  if (isLoading) {
+    return (
+      <div className="rounded-xl bg-white p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-medium text-gray-800">
+            Overall Occupancy
+          </h2>
+        </div>
+        <div className="h-[280px] flex items-center justify-center text-gray-500">
+          Loading occupancy data...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl bg-white p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-medium text-gray-800">
+            Overall Occupancy
+          </h2>
+        </div>
+        <div className="h-[280px] flex items-center justify-center text-red-600 text-sm">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (chartData.length === 0) {
+    return (
+      <div className="rounded-xl bg-white p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-medium text-gray-800">
+            Overall Occupancy
+          </h2>
+        </div>
+        <div className="h-[280px] flex items-center justify-center text-gray-500">
+          No data available
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl bg-white p-6">
       {/* Header */}
@@ -41,7 +154,7 @@ export default function OverallOccupancyChart() {
       {/* Chart */}
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data}>
+          <AreaChart data={chartData}>
             <defs>
               <linearGradient id="occupancyGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#0d9488" stopOpacity={0.25} />
@@ -67,17 +180,19 @@ export default function OverallOccupancyChart() {
             <Tooltip />
 
             {/* Live marker */}
-            <ReferenceLine
-              x="16:00"
-              stroke="#dc2626"
-              strokeDasharray="4 4"
-              label={{
-                value: "Live",
-                position: "top",
-                fill: "#dc2626",
-                fontSize: 12,
-              }}
-            />
+            {currentTime && (
+              <ReferenceLine
+                x={currentTime}
+                stroke="#dc2626"
+                strokeDasharray="4 4"
+                label={{
+                  value: "Live",
+                  position: "top",
+                  fill: "#dc2626",
+                  fontSize: 12,
+                }}
+              />
+            )}
 
             <Area
               type="monotone"
