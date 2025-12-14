@@ -1,4 +1,4 @@
-import StatCard from "./StatCard";
+import StatCard from "../../../common/ui/StatCard";
 
 export default function OccupancyFootfallCard() {
   return (
@@ -14,7 +14,7 @@ export default function OccupancyFootfallCard() {
 
       <div className="flex-1">
         <StatCard
-          title="Today’s Footfall"
+          title="Today's Footfall"
           value="2,436"
           trend="down"
           trendText="10% Less than yesterday"
@@ -23,3 +23,4 @@ export default function OccupancyFootfallCard() {
     </div>
   );
 }
+

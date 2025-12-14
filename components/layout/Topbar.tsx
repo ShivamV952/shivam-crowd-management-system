@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import LocationDropdown from "../ui/LocationDropdown";
+import LocationDropdown from "../common/ui/LocationDropdown";
 
 export default function Topbar() {
   const [selectedLocation, setSelectedLocation] = useState("Avenue Mall");

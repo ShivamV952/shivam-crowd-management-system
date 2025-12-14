@@ -1,4 +1,4 @@
-import StatCard from "./StatCard";
+import StatCard from "../../../common/ui/StatCard";
 
 export default function AvgDwellTimeCard() {
   return (
@@ -12,3 +12,4 @@ export default function AvgDwellTimeCard() {
     </div>
   );
 }
+

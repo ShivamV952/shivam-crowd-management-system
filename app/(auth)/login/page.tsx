@@ -1,5 +1,5 @@
 import Image from "next/image";
-import LoginModal from "./components/LoginModal";
+import LoginModal from "../../../components/features/auth/LoginModal";
 
 export default function LoginPage() {
   return (

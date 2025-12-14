@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Topbar from "../Components/layout/Topbar";
-import Sidebar from "../Components/layout/Sidebar";
-import StatCard from "../Components/ui/StatCard";
-import AvgDwellTimeCard from "../Components/ui/AvgDwellTimeCard";
-import OccupancyFootfallCard from "../Components/ui/OccupancyFootfallCard";
-import OverallOccupancyChart from "../Components/ui/OverallOccupancyChart";
-import DemographicsCard from "../Components/ui/DemographicsCard";
-import DemographicsAnalysisChart from "../Components/ui/DemographicsAnalysisChart";
-import VisitorTable from "../Components/ui/VisitorTable";
+import Topbar from "../../components/layout/Topbar";
+import Sidebar from "../../components/layout/Sidebar";
+import StatCard from "../../components/common/ui/StatCard";
+import AvgDwellTimeCard from "../../components/features/dashboard/overview/AvgDwellTimeCard";
+import OccupancyFootfallCard from "../../components/features/dashboard/overview/OccupancyFootfallCard";
+import OverallOccupancyChart from "../../components/charts/OverallOccupancyChart";
+import DemographicsCard from "../../components/features/dashboard/overview/DemographicsCard";
+import DemographicsAnalysisChart from "../../components/charts/DemographicsAnalysisChart";
+import VisitorTable from "../../components/features/dashboard/crowd-entries/VisitorTable";
 
 export default function DashboardPage() {
   const [activeView, setActiveView] = useState<"overview" | "crowd-entries">(
