@@ -3,18 +3,55 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import axios, { AxiosError } from "axios";
+import { login } from "@/services/api/auth.service";
+import { LoginRequest } from "@/types/contracts";
 
 export default function LoginModal() {
   const [showPassword, setShowPassword] = useState(false);
-  const [loginId, setLoginId] = useState("Parking_solutions");
-  const [password, setPassword] = useState("password");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically validate credentials with your backend
-    // For now, we'll just redirect to dashboard
-    router.push("/dashboard");
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const credentials: LoginRequest = {
+        email,
+        password,
+      };
+
+      const response = await login(credentials);
+
+      // Store token in localStorage (you may want to use a more secure storage method)
+      if (response.token) {
+        localStorage.setItem("authToken", response.token);
+      }
+
+      // Redirect to dashboard on success
+      router.push("/dashboard");
+    } catch (err) {
+      // Handle axios errors
+      if (axios.isAxiosError(err)) {
+        const axiosError = err as AxiosError<{ message?: string }>;
+        const errorMessage =
+          axiosError.response?.data?.message ||
+          axiosError.message ||
+          "Login failed. Please try again.";
+        setError(errorMessage);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -33,17 +70,26 @@ export default function LoginModal() {
 
         {/* Body */}
         <div className="px-6 py-6 space-y-5">
-          {/* Login ID */}
+          {/* Error Message */}
+          {error && (
+            <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800">
+              {error}
+            </div>
+          )}
+
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
-              Log In <span className="text-red-500">*</span>
+              Email <span className="text-red-500">*</span>
             </label>
             <input
-              type="text"
-              value={loginId}
-              onChange={(e) => setLoginId(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              placeholder="Enter your email"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -58,7 +104,9 @@ export default function LoginModal() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full rounded-md border border-gray-300 px-4 py-3 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                placeholder="Enter your password"
                 required
+                disabled={isLoading}
               />
               <button
                 type="button"
@@ -73,9 +121,10 @@ export default function LoginModal() {
           {/* Login Button */}
           <button 
             type="submit"
-            className="w-full rounded-lg bg-teal-600 py-3 text-white font-medium text-lg hover:bg-teal-700 transition"
+            disabled={isLoading}
+            className="w-full rounded-lg bg-teal-600 py-3 text-white font-medium text-lg hover:bg-teal-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </div>
       </div>
