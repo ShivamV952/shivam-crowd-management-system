@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import axios, { AxiosError } from "axios";
 import {
   Area,
   AreaChart,
@@ -9,22 +11,126 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { getDemographics } from "@/services/api/analytics.service";
+import { DemographicsRequest } from "@/types/contracts";
 
-const data = [
-  { time: "08:00", male: 175, female: 135 },
-  { time: "09:00", male: 180, female: 138 },
-  { time: "10:00", male: 185, female: 140 },
-  { time: "11:00", male: 190, female: 142 },
-  { time: "12:00", male: 198, female: 147 },
-  { time: "13:00", male: 200, female: 148 },
-  { time: "14:00", male: 190, female: 142 },
-  { time: "15:00", male: 202, female: 150 },
-  { time: "16:00", male: 208, female: 152 },
-  { time: "17:00", male: 205, female: 150 },
-  { time: "18:00", male: 215, female: 158 },
-];
+interface DemographicsAnalysisChartProps {
+  siteId?: string;
+}
 
-export default function DemographicsAnalysisChart() {
+export default function DemographicsAnalysisChart({
+  siteId,
+}: DemographicsAnalysisChartProps) {
+  const [chartData, setChartData] = useState<
+    { time: string; male: number; female: number }[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!siteId) {
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchDemographicsData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Calculate time range: last 24 hours
+        const now = new Date();
+        const toUtc = now.getTime().toString();
+        const fromUtc = (now.getTime() - 24 * 60 * 60 * 1000).toString(); // 24 hours ago
+
+        const request: DemographicsRequest = {
+          siteId,
+          fromUtc,
+          toUtc,
+        };
+
+        const response = await getDemographics(request);
+
+        // Transform API response to chart data format
+        const transformedData = response.buckets.map((bucket) => {
+          // Extract time from local string (format: "10/12/2025 00:00:00")
+          const timeMatch = bucket.local.match(/(\d{1,2}):\d{2}:\d{2}/);
+          const time = timeMatch ? timeMatch[1] : "";
+
+          return {
+            time: `${time}:00`,
+            male: Math.round(bucket.male),
+            female: Math.round(bucket.female),
+          };
+        });
+
+        setChartData(transformedData);
+      } catch (err) {
+        // Handle axios errors
+        if (axios.isAxiosError(err)) {
+          const axiosError = err as AxiosError<{ message?: string }>;
+          const errorMessage =
+            axiosError.response?.data?.message ||
+            axiosError.message ||
+            "Failed to load demographics data. Please try again.";
+          setError(errorMessage);
+        } else if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred. Please try again.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDemographicsData();
+  }, [siteId]);
+  if (isLoading) {
+    return (
+      <div className="rounded-xl bg-white p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-medium text-gray-800">
+            Demographics Analysis
+          </h2>
+        </div>
+        <div className="h-[300px] flex items-center justify-center text-gray-500">
+          Loading demographics data...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl bg-white p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-medium text-gray-800">
+            Demographics Analysis
+          </h2>
+        </div>
+        <div className="h-[300px] flex items-center justify-center text-red-600 text-sm">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (chartData.length === 0) {
+    return (
+      <div className="rounded-xl bg-white p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-medium text-gray-800">
+            Demographics Analysis
+          </h2>
+        </div>
+        <div className="h-[300px] flex items-center justify-center text-gray-500">
+          No data available
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl bg-white p-6">
       {/* Header */}
@@ -49,7 +155,7 @@ export default function DemographicsAnalysisChart() {
       {/* Chart */}
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data}>
+          <AreaChart data={chartData}>
             <defs>
               <linearGradient id="maleGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#6faeaa" stopOpacity={0.3} />

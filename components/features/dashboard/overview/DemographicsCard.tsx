@@ -1,31 +1,121 @@
 "use client";
 
-import { useMemo } from "react";
-
-interface DemographicsData {
-  male: number;
-  female: number;
-}
+import { useState, useEffect, useMemo } from "react";
+import axios, { AxiosError } from "axios";
+import { getDemographics } from "@/services/api/analytics.service";
+import { DemographicsRequest } from "@/types/contracts";
 
 interface DemographicsCardProps {
-  data?: DemographicsData;
+  siteId?: string;
 }
 
-export default function DemographicsCard({
-  data = { male: 110, female: 90 }, // dummy data
-}: DemographicsCardProps) {
-  const total = data.male + data.female;
+export default function DemographicsCard({ siteId }: DemographicsCardProps) {
+  const [demographicsData, setDemographicsData] = useState<{
+    male: number;
+    female: number;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const { malePercentage, femalePercentage } = useMemo(() => {
-    if (total === 0) {
-      return { malePercentage: 0, femalePercentage: 0 };
+  useEffect(() => {
+    if (!siteId) {
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchDemographicsData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Calculate time range: last 24 hours
+        const now = new Date();
+        const toUtc = now.getTime().toString();
+        const fromUtc = (now.getTime() - 24 * 60 * 60 * 1000).toString(); // 24 hours ago
+
+        const request: DemographicsRequest = {
+          siteId,
+          fromUtc,
+          toUtc,
+        };
+
+        const response = await getDemographics(request);
+
+        // Sum up all male and female values from buckets
+        const totals = response.buckets.reduce(
+          (acc, bucket) => {
+            acc.male += bucket.male;
+            acc.female += bucket.female;
+            return acc;
+          },
+          { male: 0, female: 0 }
+        );
+
+        setDemographicsData(totals);
+      } catch (err) {
+        // Handle axios errors
+        if (axios.isAxiosError(err)) {
+          const axiosError = err as AxiosError<{ message?: string }>;
+          const errorMessage =
+            axiosError.response?.data?.message ||
+            axiosError.message ||
+            "Failed to load demographics data. Please try again.";
+          setError(errorMessage);
+        } else if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred. Please try again.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDemographicsData();
+  }, [siteId]);
+
+  const { total, malePercentage, femalePercentage } = useMemo(() => {
+    if (!demographicsData) {
+      return { total: 0, malePercentage: 0, femalePercentage: 0 };
+    }
+
+    const totalValue = demographicsData.male + demographicsData.female;
+    if (totalValue === 0) {
+      return { total: 0, malePercentage: 0, femalePercentage: 0 };
     }
 
     return {
-      malePercentage: Math.round((data.male / total) * 100),
-      femalePercentage: Math.round((data.female / total) * 100),
+      total: totalValue,
+      malePercentage: Math.round((demographicsData.male / totalValue) * 100),
+      femalePercentage: Math.round((demographicsData.female / totalValue) * 100),
     };
-  }, [data, total]);
+  }, [demographicsData]);
+
+  if (isLoading) {
+    return (
+      <div className="w-[320px] rounded-xl bg-white p-5">
+        <h2 className="text-sm font-medium text-gray-800 mb-3">
+          Demographics
+        </h2>
+        <div className="flex items-center justify-center h-40 text-gray-500">
+          Loading...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-[320px] rounded-xl bg-white p-5">
+        <h2 className="text-sm font-medium text-gray-800 mb-3">
+          Demographics
+        </h2>
+        <div className="flex items-center justify-center h-40 text-red-600 text-sm">
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-[320px] rounded-xl bg-white p-5">
