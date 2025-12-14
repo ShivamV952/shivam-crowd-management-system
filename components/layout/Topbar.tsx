@@ -1,12 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
-import LocationDropdown from "../common/ui/LocationDropdown";
-import { getSites } from "@/services/api/sites.service";
-import { Site } from "@/types/contracts";
+import { useEffect, useState } from "react";
 
-export default function Topbar() {
+import LocationDropdown from "../common/ui/LocationDropdown";
+import { Site } from "@/types/contracts";
+import { getSites } from "@/services/api/sites.service";
+
+interface TopbarProps {
+  isSidebarCollapsed: boolean;
+  onToggleSidebar: () => void;
+}
+
+export default function Topbar({
+  isSidebarCollapsed,
+  onToggleSidebar,
+}: TopbarProps) {
   const [sites, setSites] = useState<Site[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedSiteId, setSelectedSiteId] = useState<string>("");
@@ -20,7 +29,7 @@ export default function Topbar() {
         setError(null);
         const sitesData = await getSites();
         setSites(sitesData);
-        
+
         // Set first site as default if available
         if (sitesData.length > 0) {
           setSelectedLocation(sitesData[0].name);
@@ -64,10 +73,19 @@ export default function Topbar() {
 
   return (
     <header className="flex h-14 w-full items-center gap-4 border-b border-gray-200 bg-white px-6">
+      {/* Hamburger Menu Button - Only show when sidebar is collapsed */}
+      {isSidebarCollapsed && (
+        <button
+          onClick={onToggleSidebar}
+          className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
+          aria-label="Toggle sidebar"
+        >
+          <span className="text-xl">☰</span>
+        </button>
+      )}
+
       {/* Title */}
-      <h1 className="text-sm font-medium text-gray-800">
-        Crowd Solutions
-      </h1>
+      <h1 className="text-sm font-medium text-gray-800">Crowd Solutions</h1>
 
       <span className="text-gray-300">|</span>
 
@@ -90,4 +108,3 @@ export default function Topbar() {
     </header>
   );
 }
-

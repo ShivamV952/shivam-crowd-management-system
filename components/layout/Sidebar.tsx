@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 type ViewType = "overview" | "crowd-entries";
@@ -7,9 +8,11 @@ type ViewType = "overview" | "crowd-entries";
 interface SidebarProps {
   activeView: ViewType;
   onViewChange: (view: ViewType) => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
-export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
+export default function Sidebar({ activeView, onViewChange, isCollapsed, onToggleCollapse }: SidebarProps) {
   const router = useRouter();
 
   const handleLogout = () => {
@@ -18,17 +21,27 @@ export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
   };
 
   return (
-    <aside className="flex h-screen w-64 flex-col justify-between bg-gradient-to-b from-[#1f2a2a] via-[#0f4f4a] to-[#0b3f3a] text-white">
-      
-      {/* Top Section */}
-      <div>
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold">kloudspot</span>
+    <div 
+        className={`flex h-screen flex-col justify-between bg-linear-to-b from-[#1f2a2a] via-[#0f4f4a] to-[#0b3f3a] text-white transition-all duration-300 ease-in-out ${
+          isCollapsed ? "-translate-x-full w-0" : "w-64"
+        }`}
+      >
+        
+        {/* Top Section */}
+        <div>
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 py-4">
+            <div className={`flex items-center gap-2 ${isCollapsed ? "opacity-0" : "opacity-100"} transition-opacity`}>
+              <Image src="/kloudspot-logo.png" alt="Kloudspot" width={120} height={40} className="object-contain" />
+            </div>
+            <button 
+              onClick={onToggleCollapse}
+              className="text-xl hover:opacity-80 transition-opacity"
+              aria-label="Toggle sidebar"
+            >
+              ☰
+            </button>
           </div>
-          <button className="text-xl">☰</button>
-        </div>
 
         {/* Navigation */}
         <nav className="mt-6 space-y-2 px-3">
@@ -45,8 +58,8 @@ export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
             {activeView === "overview" && (
               <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r bg-white" />
             )}
-            <span className="text-lg">🏠</span>
-            <span>Overview</span>
+            <Image src="/home.png" alt="Home" width={20} height={20} />
+            <span className={isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}>{isCollapsed ? "" : "Overview"}</span>
           </button>
 
           {/* Crowd Entries */}
@@ -61,24 +74,23 @@ export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
             {activeView === "crowd-entries" && (
               <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r bg-white" />
             )}
-            <span className="text-lg">↗</span>
-            <span>Crowd Entries</span>
+            <Image src="/arrow.png" alt="Arrow" width={20} height={20} />
+            <span className={isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}>{isCollapsed ? "" : "Crowd Entries"}</span>
           </button>
 
         </nav>
       </div>
 
       {/* Logout */}
-      <div className="px-5 py-4">
+      <div className={`px-5 py-4 ${isCollapsed ? "opacity-0" : "opacity-100"} transition-opacity`}>
         <button 
           onClick={handleLogout}
           className="flex items-center gap-3 text-sm text-gray-200 hover:text-white transition"
         >
           <span className="text-lg">⏻</span>
-          <span>Logout</span>
+          <span className={isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}>{isCollapsed ? "" : "Logout"}</span>
         </button>
       </div>
-    </aside>
+    </div>
   );
 }
-

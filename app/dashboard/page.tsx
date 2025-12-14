@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Topbar from "../../components/layout/Topbar";
-import Sidebar from "../../components/layout/Sidebar";
-import StatCard from "../../components/common/ui/StatCard";
+import { useEffect, useState } from "react";
+
 import AvgDwellTimeCard from "../../components/features/dashboard/overview/AvgDwellTimeCard";
+import DemographicsAnalysisChart from "../../components/charts/DemographicsAnalysisChart";
+import DemographicsCard from "../../components/features/dashboard/overview/DemographicsCard";
 import OccupancyFootfallCard from "../../components/features/dashboard/overview/OccupancyFootfallCard";
 import OverallOccupancyChart from "../../components/charts/OverallOccupancyChart";
-import DemographicsCard from "../../components/features/dashboard/overview/DemographicsCard";
-import DemographicsAnalysisChart from "../../components/charts/DemographicsAnalysisChart";
+import Sidebar from "../../components/layout/Sidebar";
+import StatCard from "../../components/common/ui/StatCard";
+import Topbar from "../../components/layout/Topbar";
 import VisitorTable from "../../components/features/dashboard/crowd-entries/VisitorTable";
 
 export default function DashboardPage() {
@@ -17,6 +18,7 @@ export default function DashboardPage() {
   );
   const [selectedSiteId, setSelectedSiteId] = useState<string>("");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     // Get selected site ID from localStorage
@@ -40,12 +42,20 @@ export default function DashboardPage() {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <Sidebar activeView={activeView} onViewChange={setActiveView} />
+      <Sidebar
+        activeView={activeView}
+        onViewChange={setActiveView}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+      />
 
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Topbar */}
-        <Topbar />
+        <Topbar
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
@@ -59,28 +69,31 @@ export default function DashboardPage() {
           </div>
           {activeView === "overview" && (
             <div className="pt-10 px-5">
-               <div className="flex flex-row justify-center items-center">
-                 {/* <StatCard title={""} value={""} trendText={""} trend={"up"} /> */}
-                 <OccupancyFootfallCard siteId={selectedSiteId} />
-                 <AvgDwellTimeCard siteId={selectedSiteId} />
-               </div>
-              <div className="pt-10 px-10">
-                <OverallOccupancyChart key={refreshKey} siteId={selectedSiteId} />
+              <div className="flex flex-row justify-center items-center">
+                {/* <StatCard title={""} value={""} trendText={""} trend={"up"} /> */}
+                <OccupancyFootfallCard siteId={selectedSiteId} />
+                <AvgDwellTimeCard siteId={selectedSiteId} />
               </div>
-               <div className="pt-10 flex justify-around items-center">
-                 <DemographicsCard siteId={selectedSiteId} />
-                 <DemographicsAnalysisChart siteId={selectedSiteId} />
-               </div>
+              <div className="pt-10 px-10">
+                <OverallOccupancyChart
+                  key={refreshKey}
+                  siteId={selectedSiteId}
+                />
+              </div>
+              <div className="pt-10 flex justify-around items-center">
+                <DemographicsCard siteId={selectedSiteId} />
+                <DemographicsAnalysisChart siteId={selectedSiteId} />
+              </div>
             </div>
           )}
-           {activeView === "crowd-entries" && (
-             <div className="pt-10 px-5">
-               <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                 Crowd Entries View
-               </h3>
-               <VisitorTable siteId={selectedSiteId} />
-             </div>
-           )}
+          {activeView === "crowd-entries" && (
+            <div className="pt-10 px-5">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                Crowd Entries View
+              </h3>
+              <VisitorTable siteId={selectedSiteId} />
+            </div>
+          )}
         </main>
       </div>
     </div>
