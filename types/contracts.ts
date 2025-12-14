@@ -44,10 +44,23 @@ export interface OccupancyResponse {
   buckets: OccupancyBucket[];
 }
 
+export interface DwellRequest {
+  siteId: string;
+  toUtc: string;
+  fromUtc: string;
+}
 export interface FootfallRequest {
   siteId: string;
   toUtc: string;
   fromUtc: string;
+}
+
+export interface DwellResponse {
+  siteId: string;
+  fromUtc: number;
+  toUtc: number;
+  avgDwellMinutes: number;
+  dwellRecords: number;
 }
 
 export interface FootfallResponse {

@@ -62,7 +62,7 @@ export default function DashboardPage() {
                <div className="flex flex-row justify-center items-center">
                  {/* <StatCard title={""} value={""} trendText={""} trend={"up"} /> */}
                  <OccupancyFootfallCard siteId={selectedSiteId} />
-                 <AvgDwellTimeCard />
+                 <AvgDwellTimeCard siteId={selectedSiteId} />
                </div>
               <div className="pt-10 px-10">
                 <OverallOccupancyChart key={refreshKey} siteId={selectedSiteId} />
