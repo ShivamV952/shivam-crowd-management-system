@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 interface LocationDropdownProps {
@@ -20,13 +21,15 @@ export default function LocationDropdown({
       {/* Trigger */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+        className="flex w-full min-w-0 items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
       >
-        <div className="flex items-center gap-2">
-          <span>📍</span>
-          <span>{selected}</span>
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <Image src="/location.png" alt="Location" width={16} height={16} className="flex-shrink-0" />
+          <span className="truncate">{selected}</span>
         </div>
-        <span className="text-gray-500">▾</span>
+        <div className="opacity-60 shrink-0 ml-2">
+          <Image src="/down-arrow.png" alt="Dropdown" width={16} height={16} />
+        </div>
       </button>
 
       {/* Dropdown */}
@@ -39,7 +42,7 @@ export default function LocationDropdown({
                 onChange(location);
                 setOpen(false);
               }}
-              className={`block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 ${
+              className={`block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 truncate ${
                 selected === location ? "bg-gray-100 font-medium" : ""
               }`}
             >
@@ -51,4 +54,3 @@ export default function LocationDropdown({
     </div>
   );
 }
-
