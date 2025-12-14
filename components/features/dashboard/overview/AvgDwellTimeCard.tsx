@@ -65,11 +65,13 @@ export default function AvgDwellTimeCard({ siteId }: AvgDwellTimeCardProps) {
   const formatDwellTime = (minutes: number) => {
     const mins = Math.floor(minutes);
     const secs = Math.round((minutes - mins) * 60);
-    return `${mins.toString().padStart(2, "0")}min ${secs.toString().padStart(2, "0")}sec`;
+    return `${mins.toString().padStart(2, "0")}min ${secs
+      .toString()
+      .padStart(2, "0")}sec`;
   };
 
   return (
-    <div className="w-[320px]">
+    <div className="w-[400px]">
       {isLoading ? (
         <div className="flex flex-col gap-2 rounded-xl bg-white px-6 py-5">
           <p className="text-sm font-medium text-gray-700">Avg Dwell Time</p>
@@ -84,9 +86,7 @@ export default function AvgDwellTimeCard({ siteId }: AvgDwellTimeCardProps) {
         <StatCard
           title="Avg Dwell Time"
           value={
-            avgDwellMinutes !== null
-              ? formatDwellTime(avgDwellMinutes)
-              : "--"
+            avgDwellMinutes !== null ? formatDwellTime(avgDwellMinutes) : "--"
           }
           trend="up"
           trendText="6% More than yesterday"
@@ -95,4 +95,3 @@ export default function AvgDwellTimeCard({ siteId }: AvgDwellTimeCardProps) {
     </div>
   );
 }
-

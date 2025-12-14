@@ -87,17 +87,17 @@ export default function DemographicsCard({ siteId }: DemographicsCardProps) {
     return {
       total: totalValue,
       malePercentage: Math.round((demographicsData.male / totalValue) * 100),
-      femalePercentage: Math.round((demographicsData.female / totalValue) * 100),
+      femalePercentage: Math.round(
+        (demographicsData.female / totalValue) * 100
+      ),
     };
   }, [demographicsData]);
 
   if (isLoading) {
     return (
-      <div className="w-[320px] rounded-xl bg-white p-5">
-        <h2 className="text-sm font-medium text-gray-800 mb-3">
-          Demographics
-        </h2>
-        <div className="flex items-center justify-center h-40 text-gray-500">
+      <div className="w-full h-full rounded-xl bg-white p-5">
+        <h2 className="text-sm font-medium text-gray-800 mb-3">Demographics</h2>
+        <div className="flex items-center justify-center h-64 text-gray-500">
           Loading...
         </div>
       </div>
@@ -106,11 +106,9 @@ export default function DemographicsCard({ siteId }: DemographicsCardProps) {
 
   if (error) {
     return (
-      <div className="w-[320px] rounded-xl bg-white p-5">
-        <h2 className="text-sm font-medium text-gray-800 mb-3">
-          Demographics
-        </h2>
-        <div className="flex items-center justify-center h-40 text-red-600 text-sm">
+      <div className="w-full h-full rounded-xl bg-white p-5">
+        <h2 className="text-sm font-medium text-gray-800 mb-3">Demographics</h2>
+        <div className="flex items-center justify-center h-64 text-red-600 text-sm">
           {error}
         </div>
       </div>
@@ -118,20 +116,18 @@ export default function DemographicsCard({ siteId }: DemographicsCardProps) {
   }
 
   return (
-    <div className="w-[320px] rounded-xl bg-white p-5">
+    <div className="w-full h-full rounded-xl bg-white p-5">
       {/* Header */}
-      <h2 className="text-sm font-medium text-gray-800 mb-3">
-        Demographics
-      </h2>
+      <h2 className="text-sm font-medium text-gray-800 mb-3">Demographics</h2>
 
-      <div className="relative rounded-lg bg-gray-50 p-4">
+      <div className="relative rounded-lg bg-gray-50 p-4 h-64">
         <p className="text-sm font-medium text-gray-700 mb-4">
           Chart of Demographics
         </p>
 
         <div className="flex items-center gap-6">
           {/* Donut */}
-          <div className="relative h-32 w-32">
+          <div className="relative h-40 w-40">
             <div
               className="absolute inset-0 rounded-full transition-all duration-500"
               style={{
@@ -144,9 +140,7 @@ export default function DemographicsCard({ siteId }: DemographicsCardProps) {
 
             {/* Inner circle */}
             <div className="absolute inset-4 rounded-full bg-white flex flex-col items-center justify-center text-center">
-              <span className="text-xs text-gray-500">
-                Total Crowd
-              </span>
+              <span className="text-xs text-gray-500">Total Crowd</span>
               <span className="text-sm font-semibold text-gray-900">
                 {total > 0 ? "100%" : "0%"}
               </span>
@@ -157,16 +151,12 @@ export default function DemographicsCard({ siteId }: DemographicsCardProps) {
           <div className="space-y-3 text-sm">
             <div className="flex items-center gap-2">
               <span className="h-4 w-4 rounded bg-[#7fb3b2]" />
-              <span className="text-gray-700">
-                {malePercentage}% Males
-              </span>
+              <span className="text-gray-700">{malePercentage}% Males</span>
             </div>
 
             <div className="flex items-center gap-2">
               <span className="h-4 w-4 rounded bg-[#b7e3e1]" />
-              <span className="text-gray-700">
-                {femalePercentage}% Females
-              </span>
+              <span className="text-gray-700">{femalePercentage}% Females</span>
             </div>
           </div>
         </div>
@@ -174,4 +164,3 @@ export default function DemographicsCard({ siteId }: DemographicsCardProps) {
     </div>
   );
 }
-
