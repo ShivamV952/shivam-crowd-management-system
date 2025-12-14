@@ -1,10 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios, { AxiosError } from "axios";
 import LocationDropdown from "../common/ui/LocationDropdown";
+import { getSites } from "@/services/api/sites.service";
+import { Site } from "@/types/contracts";
 
 export default function Topbar() {
-  const [selectedLocation, setSelectedLocation] = useState("Avenue Mall");
+  const [sites, setSites] = useState<Site[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSites = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const sitesData = await getSites();
+        setSites(sitesData);
+        
+        // Set first site as default if available
+        if (sitesData.length > 0) {
+          setSelectedLocation(sitesData[0].name);
+        }
+      } catch (err) {
+        // Handle axios errors
+        if (axios.isAxiosError(err)) {
+          const axiosError = err as AxiosError<{ message?: string }>;
+          const errorMessage =
+            axiosError.response?.data?.message ||
+            axiosError.message ||
+            "Failed to load sites. Please try again.";
+          setError(errorMessage);
+        } else if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred. Please try again.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSites();
+  }, []);
+
+  const locationNames = sites.map((site) => site.name);
 
   return (
     <header className="flex h-14 w-full items-center gap-4 border-b border-gray-200 bg-white px-6">
@@ -16,11 +58,21 @@ export default function Topbar() {
       <span className="text-gray-300">|</span>
 
       {/* Dropdown */}
-      <LocationDropdown
-        locations={["Avenue Mall", "City Center", "Downtown Plaza"]}
-        selected={selectedLocation}
-        onChange={setSelectedLocation}
-      />
+      {isLoading ? (
+        <div className="w-48 rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-500">
+          Loading sites...
+        </div>
+      ) : error ? (
+        <div className="w-48 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+          {error}
+        </div>
+      ) : (
+        <LocationDropdown
+          locations={locationNames}
+          selected={selectedLocation}
+          onChange={setSelectedLocation}
+        />
+      )}
     </header>
   );
 }

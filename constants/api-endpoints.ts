@@ -14,6 +14,11 @@ export const API_ENDPOINTS = {
     // REFRESH_TOKEN: `${BASE_URL}/auth/refresh`,
   },
 
+  // Sites endpoints
+  SITES: {
+    GET_ALL: `${BASE_URL}/sites`,
+  },
+
   // Add more endpoint groups here as needed
   // DASHBOARD: {
   //   OVERVIEW: `${BASE_URL}/dashboard/overview`,
