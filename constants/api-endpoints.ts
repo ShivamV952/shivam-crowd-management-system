@@ -22,6 +22,7 @@ export const API_ENDPOINTS = {
   // Analytics endpoints
   ANALYTICS: {
     OCCUPANCY: `${BASE_URL}/analytics/occupancy`,
+    FOOTFALL: `${BASE_URL}/analytics/footfall`,
   },
 
   // Add more endpoint groups here as needed

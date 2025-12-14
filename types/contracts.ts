@@ -44,3 +44,16 @@ export interface OccupancyResponse {
   buckets: OccupancyBucket[];
 }
 
+export interface FootfallRequest {
+  siteId: string;
+  toUtc: string;
+  fromUtc: string;
+}
+
+export interface FootfallResponse {
+  siteId: string;
+  fromUtc: string;
+  toUtc: string;
+  footfall: number;
+}
+
