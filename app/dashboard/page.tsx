@@ -59,11 +59,11 @@ export default function DashboardPage() {
           </div>
           {activeView === "overview" && (
             <div className="pt-10 px-5">
-              <div className="flex flex-row justify-center items-center">
-                {/* <StatCard title={""} value={""} trendText={""} trend={"up"} /> */}
-                <OccupancyFootfallCard />
-                <AvgDwellTimeCard />
-              </div>
+               <div className="flex flex-row justify-center items-center">
+                 {/* <StatCard title={""} value={""} trendText={""} trend={"up"} /> */}
+                 <OccupancyFootfallCard siteId={selectedSiteId} />
+                 <AvgDwellTimeCard />
+               </div>
               <div className="pt-10 px-10">
                 <OverallOccupancyChart key={refreshKey} siteId={selectedSiteId} />
               </div>
