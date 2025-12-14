@@ -14,6 +14,8 @@ import {
   FootfallResponse,
   DemographicsRequest,
   DemographicsResponse,
+  EntryExitRequest,
+  EntryExitResponse,
 } from "@/types/contracts";
 
 export const getOccupancy = async (request: OccupancyRequest) => {
@@ -68,6 +70,22 @@ export const getDemographics = async (request: DemographicsRequest) => {
 
   const response = await axios.post<DemographicsResponse>(
     API_ENDPOINTS.ANALYTICS.DEMOGRAPHICS,
+    request,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const getEntryExit = async (request: EntryExitRequest) => {
+  const token = localStorage.getItem("authToken");
+
+  const response = await axios.post<EntryExitResponse>(
+    API_ENDPOINTS.ANALYTICS.ENTRY_EXIT,
     request,
     {
       headers: {
