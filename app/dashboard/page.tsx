@@ -73,14 +73,14 @@ export default function DashboardPage() {
                </div>
             </div>
           )}
-          {activeView === "crowd-entries" && (
-            <div className="pt-10 px-5">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                Crowd Entries View
-              </h3>
-              <VisitorTable />
-            </div>
-          )}
+           {activeView === "crowd-entries" && (
+             <div className="pt-10 px-5">
+               <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                 Crowd Entries View
+               </h3>
+               <VisitorTable siteId={selectedSiteId} />
+             </div>
+           )}
         </main>
       </div>
     </div>

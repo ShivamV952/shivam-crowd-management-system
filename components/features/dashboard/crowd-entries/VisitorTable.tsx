@@ -1,77 +1,158 @@
-import React from "react";
-// import Image from "next/image";
+"use client";
 
-// Types
-interface Visitor {
-  id: number;
-  name: string;
-  avatar: string;
-  sex: "Male" | "Female";
-  entry: string;
-  exit?: string;
-  dwell?: string;
+import { useState, useEffect } from "react";
+import axios, { AxiosError } from "axios";
+import { getEntryExit } from "@/services/api/analytics.service";
+import { EntryExitRequest } from "@/types/contracts";
+
+interface VisitorTableProps {
+  siteId?: string;
 }
 
-// Dummy data (replace with API data if needed)
-const visitors: Visitor[] = [
-  {
-    id: 1,
-    name: "Alice Johnson",
-    avatar: "https://i.pravatar.cc/40?img=1",
-    sex: "Female",
-    entry: "11:05 AM",
-  },
-  {
-    id: 2,
-    name: "Brian Smith",
-    avatar: "https://i.pravatar.cc/40?img=2",
-    sex: "Male",
-    entry: "11:03 AM",
-  },
-  {
-    id: 3,
-    name: "Catherine Lee",
-    avatar: "https://i.pravatar.cc/40?img=3",
-    sex: "Female",
-    entry: "11:00 AM",
-  },
-  {
-    id: 4,
-    name: "David Brown",
-    avatar: "https://i.pravatar.cc/40?img=4",
-    sex: "Male",
-    entry: "10:50 AM",
-    exit: "11:10 AM",
-    dwell: "00:20",
-  },
-  {
-    id: 5,
-    name: "Eva White",
-    avatar: "https://i.pravatar.cc/40?img=5",
-    sex: "Female",
-    entry: "11:20 AM",
-    exit: "11:30 AM",
-    dwell: "00:10",
-  },
-  {
-    id: 6,
-    name: "Frank Green",
-    avatar: "https://i.pravatar.cc/40?img=6",
-    sex: "Male",
-    entry: "11:50 AM",
-    exit: "12:10 PM",
-    dwell: "00:20",
-  },
-];
+export default function VisitorTable({ siteId }: VisitorTableProps) {
+  const [records, setRecords] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const pageSize = 10;
 
-const VisitorTable: React.FC = () => {
+  useEffect(() => {
+    if (!siteId) {
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchEntryExitData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Calculate time range: last 24 hours
+        const now = new Date();
+        const toUtc = now.getTime().toString();
+        const fromUtc = (now.getTime() - 24 * 60 * 60 * 1000).toString(); // 24 hours ago
+
+        const request: EntryExitRequest = {
+          siteId,
+          fromUtc,
+          toUtc,
+          pageNumber: currentPage,
+          pageSize,
+        };
+
+        const response = await getEntryExit(request);
+        setRecords(response.records);
+        setTotalPages(response.totalPages);
+        setTotalRecords(response.totalRecords);
+      } catch (err) {
+        // Handle axios errors
+        if (axios.isAxiosError(err)) {
+          const axiosError = err as AxiosError<{ message?: string }>;
+          const errorMessage =
+            axiosError.response?.data?.message ||
+            axiosError.message ||
+            "Failed to load entry-exit data. Please try again.";
+          setError(errorMessage);
+        } else if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred. Please try again.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEntryExitData();
+  }, [siteId, currentPage]);
+
+  // Format time from local string (format: "10/12/2025 00:00:00")
+  const formatTime = (localTime: string) => {
+    if (!localTime) return "--";
+    const timeMatch = localTime.match(/(\d{1,2}):(\d{2}):(\d{2})/);
+    if (!timeMatch) return localTime;
+
+    const hour = parseInt(timeMatch[1]);
+    const minute = timeMatch[2];
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour % 12 || 12;
+
+    return `${displayHour}:${minute} ${ampm}`;
+  };
+
+  // Format dwell time from minutes to "HH:MM" format
+  const formatDwellTime = (minutes: number) => {
+    if (minutes === 0 || !minutes) return "--";
+    const hrs = Math.floor(minutes / 60);
+    const mins = Math.floor(minutes % 60);
+    return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`;
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    const maxVisible = 5;
+
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push("…");
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push("…");
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push("…");
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push("…");
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white">
+        <div className="flex items-center justify-center py-12 text-gray-500">
+          Loading entry-exit data...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white">
+        <div className="flex items-center justify-center py-12 text-red-600 text-sm">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white">
       <table className="w-full border-collapse text-sm">
         <thead className="bg-gray-100 text-left text-gray-600">
           <tr>
             <th className="px-6 py-4 font-medium">Name</th>
-            <th className="px-6 py-4 font-medium">Sex</th>
+            <th className="px-6 py-4 font-medium">Zone</th>
             <th className="px-6 py-4 font-medium">Entry</th>
             <th className="px-6 py-4 font-medium">Exit</th>
             <th className="px-6 py-4 font-medium">Dwell Time</th>
@@ -79,41 +160,85 @@ const VisitorTable: React.FC = () => {
         </thead>
 
         <tbody className="divide-y divide-gray-200">
-          {visitors.map((v) => (
-            <tr key={v.id} className="hover:bg-gray-50">
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-3">
-                  {/* <Image
-                    src={v.avatar}
-                    alt={v.name}
-                    className="h-9 w-9 rounded-full object-cover"
-                  /> */}
-                  <span className="font-medium text-gray-800">{v.name}</span>
-                </div>
+          {records.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                No records found
               </td>
-
-              <td className="px-6 py-4 text-gray-600">{v.sex}</td>
-              <td className="px-6 py-4 text-gray-600">{v.entry}</td>
-              <td className="px-6 py-4 text-gray-600">{v.exit ?? "--"}</td>
-              <td className="px-6 py-4 text-gray-600">{v.dwell ?? "--"}</td>
             </tr>
-          ))}
+          ) : (
+            records.map((record) => (
+              <tr key={record.personId} className="hover:bg-gray-50">
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <span className="font-medium text-gray-800">
+                      {record.personName || "--"}
+                    </span>
+                  </div>
+                </td>
+
+                <td className="px-6 py-4 text-gray-600">
+                  {record.zoneName || "--"}
+                </td>
+                <td className="px-6 py-4 text-gray-600">
+                  {formatTime(record.entryLocal)}
+                </td>
+                <td className="px-6 py-4 text-gray-600">
+                  {record.exitLocal ? formatTime(record.exitLocal) : "--"}
+                </td>
+                <td className="px-6 py-4 text-gray-600">
+                  {formatDwellTime(record.dwellMinutes)}
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
 
       {/* Pagination */}
-      <div className="flex items-center justify-center gap-2 py-4">
-        <button className="px-2 text-gray-500 hover:text-black">‹</button>
-        <button className="rounded border px-3 py-1 text-sm">1</button>
-        <button className="px-3 py-1 text-sm text-gray-600">2</button>
-        <button className="px-3 py-1 text-sm text-gray-600">3</button>
-        <span className="px-2">…</span>
-        <button className="px-3 py-1 text-sm text-gray-600">5</button>
-        <button className="px-2 text-gray-500 hover:text-black">›</button>
-      </div>
+      {totalPages > 0 && (
+        <div className="flex items-center justify-center gap-2 py-4">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className="px-2 text-gray-500 hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            ‹
+          </button>
+          {getPageNumbers().map((page, index) => {
+            if (page === "…") {
+              return (
+                <span key={`ellipsis-${index}`} className="px-2">
+                  …
+                </span>
+              );
+            }
+            return (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page as number)}
+                className={`px-3 py-1 text-sm rounded ${
+                  currentPage === page
+                    ? "border bg-gray-100 font-medium"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                {page}
+              </button>
+            );
+          })}
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+            }
+            disabled={currentPage === totalPages}
+            className="px-2 text-gray-500 hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            ›
+          </button>
+        </div>
+      )}
     </div>
   );
-};
-
-export default VisitorTable;
+}
 

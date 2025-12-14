@@ -91,3 +91,33 @@ export interface DemographicsResponse {
   buckets: DemographicsBucket[];
 }
 
+export interface EntryExitRequest {
+  siteId: string;
+  toUtc: string;
+  fromUtc: string;
+  pageNumber: number;
+  pageSize: number;
+}
+
+export interface EntryExitRecord {
+  personId: string;
+  personName: string;
+  zoneId: string;
+  zoneName: string;
+  severity: string;
+  entryUtc: number;
+  entryLocal: string;
+  exitUtc: number;
+  exitLocal: string;
+  dwellMinutes: number;
+}
+
+export interface EntryExitResponse {
+  siteId: string;
+  totalRecords: number;
+  totalPages: number;
+  pageNumber: number;
+  pageSize: number;
+  records: EntryExitRecord[];
+}
+
