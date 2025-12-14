@@ -10,6 +10,8 @@ import {
   OccupancyResponse,
   DwellRequest,
   DwellResponse,
+  FootfallRequest,
+  FootfallResponse,
 } from "@/types/contracts";
 
 export const getOccupancy = async (request: OccupancyRequest) => {
@@ -33,6 +35,21 @@ export const getDwell = async (request: DwellRequest) => {
 
   const response = await axios.post<DwellResponse>(
     API_ENDPOINTS.ANALYTICS.DWELL,
+    request,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
+export const getFootfall = async (request: FootfallRequest) => {
+  const token = localStorage.getItem("authToken");
+
+  const response = await axios.post<FootfallResponse>(
+    API_ENDPOINTS.ANALYTICS.FOOTFALL,
     request,
     {
       headers: {

@@ -61,7 +61,7 @@ export default function DashboardPage() {
             <div className="pt-10 px-5">
                <div className="flex flex-row justify-center items-center">
                  {/* <StatCard title={""} value={""} trendText={""} trend={"up"} /> */}
-                 <OccupancyFootfallCard />
+                 <OccupancyFootfallCard siteId={selectedSiteId} />
                  <AvgDwellTimeCard siteId={selectedSiteId} />
                </div>
               <div className="pt-10 px-10">

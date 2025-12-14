@@ -49,6 +49,11 @@ export interface DwellRequest {
   toUtc: string;
   fromUtc: string;
 }
+export interface FootfallRequest {
+  siteId: string;
+  toUtc: string;
+  fromUtc: string;
+}
 
 export interface DwellResponse {
   siteId: string;
@@ -56,5 +61,12 @@ export interface DwellResponse {
   toUtc: number;
   avgDwellMinutes: number;
   dwellRecords: number;
+}
+
+export interface FootfallResponse {
+  siteId: string;
+  fromUtc: string;
+  toUtc: string;
+  footfall: number;
 }
 
