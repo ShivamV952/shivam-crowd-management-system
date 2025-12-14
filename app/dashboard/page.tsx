@@ -59,39 +59,60 @@ export default function DashboardPage() {
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
-          <div className="mx-auto max-w-7xl">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Dashboard
-            </h2>
-            <p className="text-gray-600">
-              Welcome to the Crowd Management System Dashboard
-            </p>
+          <div className="pt-7 px-5">
+            <div className="flex justify-center">
+              <div className="w-[1420px]">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                  Overview
+                </h2>
+              </div>
+            </div>
           </div>
           {activeView === "overview" && (
-            <div className="pt-10 px-5">
-              <div className="flex flex-row justify-center items-center">
-                {/* <StatCard title={""} value={""} trendText={""} trend={"up"} /> */}
-                <OccupancyFootfallCard siteId={selectedSiteId} />
+            <div className="px-5">
+              <div className="flex justify-center">
+                <div className="w-[1420px]">
+                  <p className="text-gray-600 pb-5 text-xl font-semibold">
+                    Occupancy
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-row justify-center items-center gap-4 mx-auto w-[1420px]">
+                <div className="w-[1000px]">
+                  <OccupancyFootfallCard siteId={selectedSiteId} />
+                </div>
                 <AvgDwellTimeCard siteId={selectedSiteId} />
               </div>
-              <div className="pt-10 px-10">
-                <OverallOccupancyChart
-                  key={refreshKey}
-                  siteId={selectedSiteId}
-                />
+              <div className="pt-10 flex justify-center">
+                <div className="w-[1420px]">
+                  <OverallOccupancyChart
+                    key={refreshKey}
+                    siteId={selectedSiteId}
+                  />
+                </div>
               </div>
-              <div className="pt-10 flex justify-around items-center">
-                <DemographicsCard siteId={selectedSiteId} />
-                <DemographicsAnalysisChart siteId={selectedSiteId} />
+              <p className="text-gray-600 py-5 text-xl font-semibold">
+                Demographics
+              </p>
+              <div className="pt-2 flex justify-center">
+                <div className="flex gap-2 w-[1420px]">
+                  <div className="w-[35%]">
+                    <DemographicsCard siteId={selectedSiteId} />
+                  </div>
+                  <div className="w-[65%]">
+                    <DemographicsAnalysisChart siteId={selectedSiteId} />
+                  </div>
+                </div>
               </div>
             </div>
           )}
           {activeView === "crowd-entries" && (
-            <div className="pt-10 px-5">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                Crowd Entries View
-              </h3>
-              <VisitorTable siteId={selectedSiteId} />
+            <div className="px-5">
+              <div className="flex justify-center">
+                <div className="w-[1420px]">
+                  <VisitorTable siteId={selectedSiteId} />
+                </div>
+              </div>
             </div>
           )}
         </main>
