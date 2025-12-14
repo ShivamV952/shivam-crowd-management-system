@@ -24,7 +24,13 @@ export default function LocationDropdown({
         className="flex w-full min-w-0 items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
       >
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <Image src="/location.png" alt="Location" width={16} height={16} className="flex-shrink-0" />
+          <Image
+            src="/location.png"
+            alt="Location"
+            width={16}
+            height={16}
+            className="flex-shrink-0"
+          />
           <span className="truncate">{selected}</span>
         </div>
         <div className="opacity-60 shrink-0 ml-2">

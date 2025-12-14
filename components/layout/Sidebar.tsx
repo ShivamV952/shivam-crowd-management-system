@@ -2,18 +2,18 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 type ViewType = "overview" | "crowd-entries";
 
 interface SidebarProps {
   activeView: ViewType;
   onViewChange: (view: ViewType) => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
-export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
+export default function Sidebar({ activeView, onViewChange, isCollapsed, onToggleCollapse }: SidebarProps) {
   const router = useRouter();
-  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleLogout = () => {
     // Clear any auth state if needed
@@ -21,19 +21,7 @@ export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
   };
 
   return (
-    <>
-      {/* Floating toggle button when collapsed */}
-      {isCollapsed && (
-        <button
-          onClick={() => setIsCollapsed(false)}
-          className="fixed left-4 top-16 z-50 flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-b from-[#1f2a2a] via-[#0f4f4a] to-[#0b3f3a] text-white shadow-lg hover:opacity-80 transition-opacity"
-          aria-label="Open sidebar"
-        >
-          <span className="text-xl">☰</span>
-        </button>
-      )}
-
-      <div 
+    <div 
         className={`flex h-screen flex-col justify-between bg-linear-to-b from-[#1f2a2a] via-[#0f4f4a] to-[#0b3f3a] text-white transition-all duration-300 ease-in-out ${
           isCollapsed ? "-translate-x-full w-0" : "w-64"
         }`}
@@ -47,7 +35,7 @@ export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
               <Image src="/kloudspot-logo.png" alt="Kloudspot" width={120} height={40} className="object-contain" />
             </div>
             <button 
-              onClick={() => setIsCollapsed(!isCollapsed)}
+              onClick={onToggleCollapse}
               className="text-xl hover:opacity-80 transition-opacity"
               aria-label="Toggle sidebar"
             >
@@ -104,7 +92,5 @@ export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
         </button>
       </div>
     </div>
-    </>
   );
 }
-
