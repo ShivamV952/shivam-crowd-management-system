@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Topbar from "../../components/layout/Topbar";
 import Sidebar from "../../components/layout/Sidebar";
 import StatCard from "../../components/common/ui/StatCard";
@@ -15,6 +15,27 @@ export default function DashboardPage() {
   const [activeView, setActiveView] = useState<"overview" | "crowd-entries">(
     "overview"
   );
+  const [selectedSiteId, setSelectedSiteId] = useState<string>("");
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    // Get selected site ID from localStorage
+    const siteId = localStorage.getItem("selectedSiteId") || "";
+    setSelectedSiteId(siteId);
+
+    // Listen for custom event when site changes
+    const handleSiteChange = () => {
+      const newSiteId = localStorage.getItem("selectedSiteId") || "";
+      setSelectedSiteId(newSiteId);
+      setRefreshKey((prev) => prev + 1); // Trigger chart refresh
+    };
+
+    window.addEventListener("siteChanged", handleSiteChange);
+
+    return () => {
+      window.removeEventListener("siteChanged", handleSiteChange);
+    };
+  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -39,12 +60,12 @@ export default function DashboardPage() {
           {activeView === "overview" && (
             <div className="pt-10 px-5">
               <div className="flex flex-row justify-center items-center">
-                <StatCard title={""} value={""} trendText={""} trend={"up"} />
-                <AvgDwellTimeCard />
+                {/* <StatCard title={""} value={""} trendText={""} trend={"up"} /> */}
                 <OccupancyFootfallCard />
+                <AvgDwellTimeCard />
               </div>
               <div className="pt-10 px-10">
-                <OverallOccupancyChart />
+                <OverallOccupancyChart key={refreshKey} siteId={selectedSiteId} />
               </div>
               <div className="pt-10 flex justify-around items-center">
                 <DemographicsCard />

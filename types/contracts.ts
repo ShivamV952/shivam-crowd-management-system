@@ -24,3 +24,23 @@ export interface Site {
 
 export type SitesResponse = Site[];
 
+export interface OccupancyRequest {
+  siteId: string;
+  toUtc: string;
+  fromUtc: string;
+}
+
+export interface OccupancyBucket {
+  utc: number;
+  local: string;
+  avg: number;
+}
+
+export interface OccupancyResponse {
+  siteId: string;
+  fromUtc: string;
+  toUtc: string;
+  timezone: string;
+  buckets: OccupancyBucket[];
+}
+

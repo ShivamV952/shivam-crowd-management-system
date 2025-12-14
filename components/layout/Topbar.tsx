@@ -9,6 +9,7 @@ import { Site } from "@/types/contracts";
 export default function Topbar() {
   const [sites, setSites] = useState<Site[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedSiteId, setSelectedSiteId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,6 +24,8 @@ export default function Topbar() {
         // Set first site as default if available
         if (sitesData.length > 0) {
           setSelectedLocation(sitesData[0].name);
+          setSelectedSiteId(sitesData[0].siteId);
+          localStorage.setItem("selectedSiteId", sitesData[0].siteId);
         }
       } catch (err) {
         // Handle axios errors
@@ -45,6 +48,17 @@ export default function Topbar() {
 
     fetchSites();
   }, []);
+
+  const handleLocationChange = (locationName: string) => {
+    setSelectedLocation(locationName);
+    const selectedSite = sites.find((site) => site.name === locationName);
+    if (selectedSite) {
+      setSelectedSiteId(selectedSite.siteId);
+      localStorage.setItem("selectedSiteId", selectedSite.siteId);
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new Event("siteChanged"));
+    }
+  };
 
   const locationNames = sites.map((site) => site.name);
 
@@ -70,7 +84,7 @@ export default function Topbar() {
         <LocationDropdown
           locations={locationNames}
           selected={selectedLocation}
-          onChange={setSelectedLocation}
+          onChange={handleLocationChange}
         />
       )}
     </header>
