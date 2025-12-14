@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 import axios, { AxiosError } from "axios";
-import { login } from "@/services/api/auth.service";
+
+import Image from "next/image";
 import { LoginRequest } from "@/types/contracts";
+import { login } from "@/services/api/auth.service";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function LoginModal() {
   const [showPassword, setShowPassword] = useState(false);
@@ -113,13 +114,19 @@ export default function LoginModal() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
               >
-                {showPassword ? "🙈" : "👁️"}
+                <Image
+                  src="/eye.png"
+                  alt={showPassword ? "Hide password" : "Show password"}
+                  width={20}
+                  height={20}
+                  className={showPassword ? "opacity-50" : "opacity-100"}
+                />
               </button>
             </div>
           </div>
 
           {/* Login Button */}
-          <button 
+          <button
             type="submit"
             disabled={isLoading}
             className="w-full rounded-lg bg-teal-600 py-3 text-white font-medium text-lg hover:bg-teal-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -131,4 +138,3 @@ export default function LoginModal() {
     </form>
   );
 }
-
