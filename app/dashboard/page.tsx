@@ -14,7 +14,9 @@ import VisitorTable from "@/components/dashboard/tables/VisitorTable";
 const CONTAINER_WIDTH = "w-[1420px]";
 
 export default function DashboardPage() {
-  const [activeView, setActiveView] = useState<"overview" | "crowd-entries">("overview");
+  const [activeView, setActiveView] = useState<"overview" | "crowd-entries">(
+    "overview"
+  );
   const [selectedSiteId, setSelectedSiteId] = useState<string>(
     () => localStorage.getItem("selectedSiteId") || ""
   );
@@ -54,7 +56,9 @@ export default function DashboardPage() {
           <div className="pt-7 px-5">
             <div className="flex justify-center">
               <div className={CONTAINER_WIDTH}>
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Overview</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                  Overview
+                </h2>
               </div>
             </div>
           </div>
@@ -63,7 +67,9 @@ export default function DashboardPage() {
             <div className="px-5">
               <div className="flex justify-center">
                 <div className={CONTAINER_WIDTH}>
-                  <p className="text-gray-600 pb-5 text-xl font-semibold">Occupancy</p>
+                  <p className="text-gray-600 pb-5 text-xl font-semibold">
+                    Occupancy
+                  </p>
                 </div>
               </div>
               <div className="flex justify-center items-center gap-4 w-[1420px] mx-auto">
@@ -74,12 +80,17 @@ export default function DashboardPage() {
               </div>
               <div className="pt-10 flex justify-center">
                 <div className={CONTAINER_WIDTH}>
-                  <OverallOccupancyChart key={refreshKey} siteId={selectedSiteId} />
+                  <OverallOccupancyChart
+                    key={refreshKey}
+                    siteId={selectedSiteId}
+                  />
                 </div>
               </div>
               <div className="flex justify-center">
                 <div className={CONTAINER_WIDTH}>
-                  <p className="text-gray-600 py-5 text-xl font-semibold">Demographics</p>
+                  <p className="text-gray-600 py-5 text-xl font-semibold">
+                    Demographics
+                  </p>
                 </div>
               </div>
               <div className="pt-2 flex justify-center">
