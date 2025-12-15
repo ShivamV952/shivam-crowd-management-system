@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
 import axios, { AxiosError } from "axios";
-import { getDemographics } from "@/services/api/analytics.service";
+import { useEffect, useMemo, useState } from "react";
+
 import { DemographicsRequest } from "@/types/contracts";
+import { getDemographics } from "@/services/api/analytics.service";
 
 interface DemographicsCardProps {
   siteId?: string;
@@ -116,16 +117,14 @@ export default function DemographicsCard({ siteId }: DemographicsCardProps) {
   }
 
   return (
-    <div className="w-full h-full rounded-xl bg-white p-5">
+    <div className="w-full h-full rounded-xl bg-white p-6">
       {/* Header */}
-      <h2 className="text-sm font-medium text-gray-800 mb-3">Demographics</h2>
+      <h2 className="text-sm font-medium text-gray-800 mb-3">
+        Chart of Demographics
+      </h2>
 
-      <div className="relative rounded-lg bg-gray-50 p-4 h-64">
-        <p className="text-sm font-medium text-gray-700 mb-4">
-          Chart of Demographics
-        </p>
-
-        <div className="flex items-center gap-6">
+      <div className="relative p-4 h-64">
+        <div className="flex flex-col items-start gap-4">
           {/* Donut */}
           <div className="relative h-40 w-40">
             <div
@@ -147,8 +146,8 @@ export default function DemographicsCard({ siteId }: DemographicsCardProps) {
             </div>
           </div>
 
-          {/* Legend */}
-          <div className="space-y-3 text-sm">
+          {/* Legend - Stacked vertically */}
+          <div className="flex flex-col gap-3 text-sm">
             <div className="flex items-center gap-2">
               <span className="h-4 w-4 rounded bg-[#7fb3b2]" />
               <span className="text-gray-700">{malePercentage}% Males</span>

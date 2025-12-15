@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { FootfallRequest, OccupancyRequest } from "@/types/contracts";
 import axios, { AxiosError } from "axios";
+import { getFootfall, getOccupancy } from "@/services/api/analytics.service";
+import { useEffect, useState } from "react";
+
 import StatCard from "../../ui/StatCard";
-import { getFootfall } from "@/services/api/analytics.service";
-import { FootfallRequest } from "@/types/contracts";
 
 interface OccupancyFootfallCardProps {
   siteId?: string;
@@ -13,6 +14,7 @@ interface OccupancyFootfallCardProps {
 export default function OccupancyFootfallCard({
   siteId,
 }: OccupancyFootfallCardProps) {
+  const [liveOccupancy, setLiveOccupancy] = useState<number | null>(null);
   const [footfall, setFootfall] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export default function OccupancyFootfallCard({
       return;
     }
 
-    const fetchFootfallData = async () => {
+    const fetchData = async () => {
       try {
         setIsLoading(true);
         setError(null);
@@ -31,24 +33,29 @@ export default function OccupancyFootfallCard({
         // Calculate time range: last 24 hours
         const now = new Date();
         const toUtc = now.getTime().toString();
-        const fromUtc = (now.getTime() - 24 * 60 * 60 * 1000).toString(); // 24 hours ago
+        const fromUtc = (now.getTime() - 24 * 60 * 60 * 1000).toString();
 
-        const request: FootfallRequest = {
-          siteId,
-          fromUtc,
-          toUtc,
-        };
+        // Fetch occupancy and footfall data in parallel
+        const [occupancyResponse, footfallResponse] = await Promise.all([
+          getOccupancy({ siteId, fromUtc, toUtc } as OccupancyRequest),
+          getFootfall({ siteId, fromUtc, toUtc } as FootfallRequest),
+        ]);
 
-        const response = await getFootfall(request);
-        setFootfall(response.footfall);
+        // Get the most recent occupancy value (last bucket's avg)
+        if (occupancyResponse.buckets && occupancyResponse.buckets.length > 0) {
+          const latestBucket =
+            occupancyResponse.buckets[occupancyResponse.buckets.length - 1];
+          setLiveOccupancy(Math.round(latestBucket.avg));
+        }
+
+        setFootfall(footfallResponse.footfall);
       } catch (err) {
-        // Handle axios errors
         if (axios.isAxiosError(err)) {
           const axiosError = err as AxiosError<{ message?: string }>;
           const errorMessage =
             axiosError.response?.data?.message ||
             axiosError.message ||
-            "Failed to load footfall data. Please try again.";
+            "Failed to load data. Please try again.";
           setError(errorMessage);
         } else if (err instanceof Error) {
           setError(err.message);
@@ -60,7 +67,7 @@ export default function OccupancyFootfallCard({
       }
     };
 
-    fetchFootfallData();
+    fetchData();
   }, [siteId]);
 
   // Format number with commas
@@ -71,23 +78,39 @@ export default function OccupancyFootfallCard({
   return (
     <div className="flex w-full rounded-xl bg-white divide-x divide-gray-200">
       <div className="flex-1">
-        <StatCard
-          title="Live Occupancy"
-          value="734"
-          trend="up"
-          trendText="10% More than yesterday"
-        />
+        {isLoading ? (
+          <div className="flex flex-col gap-2 rounded-xl bg-white px-6 py-5">
+            <p className="text-sm font-medium text-gray-700">Live Occupancy</p>
+            <p className="text-3xl font-semibold text-gray-900">Loading...</p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col gap-2 rounded-xl bg-white px-6 py-5">
+            <p className="text-sm font-medium text-gray-700">Live Occupancy</p>
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        ) : (
+          <StatCard
+            title="Live Occupancy"
+            value={liveOccupancy !== null ? formatNumber(liveOccupancy) : "--"}
+            trend="up"
+            trendText="10% More than yesterday"
+          />
+        )}
       </div>
 
       <div className="flex-1">
         {isLoading ? (
           <div className="flex flex-col gap-2 rounded-xl bg-white px-6 py-5">
-            <p className="text-sm font-medium text-gray-700">Today's Footfall</p>
+            <p className="text-sm font-medium text-gray-700">
+              Today&apos;s Footfall
+            </p>
             <p className="text-3xl font-semibold text-gray-900">Loading...</p>
           </div>
         ) : error ? (
           <div className="flex flex-col gap-2 rounded-xl bg-white px-6 py-5">
-            <p className="text-sm font-medium text-gray-700">Today's Footfall</p>
+            <p className="text-sm font-medium text-gray-700">
+              Today&apos;s Footfall
+            </p>
             <p className="text-sm text-red-600">{error}</p>
           </div>
         ) : (
@@ -102,4 +125,3 @@ export default function OccupancyFootfallCard({
     </div>
   );
 }
-
