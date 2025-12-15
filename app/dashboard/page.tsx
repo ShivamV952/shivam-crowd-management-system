@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from "react";
 
-import AvgDwellTimeCard from "../../components/features/dashboard/overview/AvgDwellTimeCard";
-import DemographicsAnalysisChart from "../../components/charts/DemographicsAnalysisChart";
-import DemographicsCard from "../../components/features/dashboard/overview/DemographicsCard";
-import OccupancyFootfallCard from "../../components/features/dashboard/overview/OccupancyFootfallCard";
-import OverallOccupancyChart from "../../components/charts/OverallOccupancyChart";
 import Sidebar from "../../components/layout/Sidebar";
-import StatCard from "../../components/common/ui/StatCard";
 import Topbar from "../../components/layout/Topbar";
-import VisitorTable from "../../components/features/dashboard/crowd-entries/VisitorTable";
+import AvgDwellTimeCard from "@/components/dashboard/cards/AvgDwellTimeCard";
+import DemographicsCard from "@/components/dashboard/cards/DemographicsCard";
+import OccupancyFootfallCard from "@/components/dashboard/cards/OccupancyFootfallCard";
+import DemographicsAnalysisChart from "@/components/dashboard/charts/DemographicsAnalysisChart";
+import OverallOccupancyChart from "@/components/dashboard/charts/OverallOccupancyChart";
+import VisitorTable from "@/components/dashboard/tables/VisitorTable";
 
 export default function DashboardPage() {
   const [activeView, setActiveView] = useState<"overview" | "crowd-entries">(

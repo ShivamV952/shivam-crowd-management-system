@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
-import StatCard from "../../../common/ui/StatCard";
+import StatCard from "../../ui/StatCard";
 import { getDwell } from "@/services/api/analytics.service";
 import { DwellRequest } from "@/types/contracts";
 

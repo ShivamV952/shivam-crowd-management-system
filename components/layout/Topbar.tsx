@@ -3,7 +3,7 @@
 import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 
-import LocationDropdown from "../common/ui/LocationDropdown";
+import LocationDropdown from "../ui/LocationDropdown";
 import { Site } from "@/types/contracts";
 import { getSites } from "@/services/api/sites.service";
 
