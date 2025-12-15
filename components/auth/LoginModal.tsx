@@ -5,6 +5,7 @@ import axios, { AxiosError } from "axios";
 import Image from "next/image";
 import { LoginRequest } from "@/types/contracts";
 import { login } from "@/services/api/auth.service";
+import { setAuthToken } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -29,9 +30,9 @@ export default function LoginModal() {
 
       const response = await login(credentials);
 
-      // Store token in localStorage (you may want to use a more secure storage method)
+      // Store token securely (never log credentials or tokens)
       if (response.token) {
-        localStorage.setItem("authToken", response.token);
+        setAuthToken(response.token);
       }
 
       // Redirect to dashboard on success

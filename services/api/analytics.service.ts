@@ -1,25 +1,29 @@
 /**
  * Analytics API Service
  * Handles all analytics-related API calls
+ * IMPORTANT: Never log tokens
  */
 
-import axios from "axios";
-import { API_ENDPOINTS } from "@/constants/api-endpoints";
 import {
-  OccupancyRequest,
-  OccupancyResponse,
-  DwellRequest,
-  DwellResponse,
-  FootfallRequest,
-  FootfallResponse,
   DemographicsRequest,
   DemographicsResponse,
+  DwellRequest,
+  DwellResponse,
   EntryExitRequest,
   EntryExitResponse,
+  FootfallRequest,
+  FootfallResponse,
+  OccupancyRequest,
+  OccupancyResponse,
 } from "@/types/contracts";
 
+import { API_ENDPOINTS } from "@/constants/api-endpoints";
+import axios from "axios";
+import { getAuthToken } from "@/utils/auth";
+
 export const getOccupancy = async (request: OccupancyRequest) => {
-  const token = localStorage.getItem("authToken");
+  const token = getAuthToken();
+  if (!token) throw new Error("Authentication required");
 
   const response = await axios.post<OccupancyResponse>(
     API_ENDPOINTS.ANALYTICS.OCCUPANCY,
@@ -35,7 +39,8 @@ export const getOccupancy = async (request: OccupancyRequest) => {
 };
 
 export const getDwell = async (request: DwellRequest) => {
-  const token = localStorage.getItem("authToken");
+  const token = getAuthToken();
+  if (!token) throw new Error("Authentication required");
 
   const response = await axios.post<DwellResponse>(
     API_ENDPOINTS.ANALYTICS.DWELL,
@@ -49,8 +54,10 @@ export const getDwell = async (request: DwellRequest) => {
 
   return response.data;
 };
+
 export const getFootfall = async (request: FootfallRequest) => {
-  const token = localStorage.getItem("authToken");
+  const token = getAuthToken();
+  if (!token) throw new Error("Authentication required");
 
   const response = await axios.post<FootfallResponse>(
     API_ENDPOINTS.ANALYTICS.FOOTFALL,
@@ -66,7 +73,8 @@ export const getFootfall = async (request: FootfallRequest) => {
 };
 
 export const getDemographics = async (request: DemographicsRequest) => {
-  const token = localStorage.getItem("authToken");
+  const token = getAuthToken();
+  if (!token) throw new Error("Authentication required");
 
   const response = await axios.post<DemographicsResponse>(
     API_ENDPOINTS.ANALYTICS.DEMOGRAPHICS,
@@ -82,7 +90,8 @@ export const getDemographics = async (request: DemographicsRequest) => {
 };
 
 export const getEntryExit = async (request: EntryExitRequest) => {
-  const token = localStorage.getItem("authToken");
+  const token = getAuthToken();
+  if (!token) throw new Error("Authentication required");
 
   const response = await axios.post<EntryExitResponse>(
     API_ENDPOINTS.ANALYTICS.ENTRY_EXIT,
@@ -96,4 +105,3 @@ export const getEntryExit = async (request: EntryExitRequest) => {
 
   return response.data;
 };
-

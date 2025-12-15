@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { removeAuthToken } from "@/utils/auth";
 
 type ViewType = "overview" | "crowd-entries";
 
@@ -16,7 +17,7 @@ export default function Sidebar({ activeView, onViewChange, isCollapsed, onToggl
   const router = useRouter();
 
   const handleLogout = () => {
-    // Clear any auth state if needed
+    removeAuthToken();
     router.push("/login");
   };
 
